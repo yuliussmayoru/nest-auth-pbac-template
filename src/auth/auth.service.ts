@@ -32,22 +32,18 @@ export class AuthService {
             throw new UnauthorizedException('Invalid Credentials')
         }
 
-        const payload = { sub: user.id, role: user.role.name }
-        const token = this.jwt.sign(payload)
+        const permissions = user.role.permissions.map(
+            (rp) => rp.permission.permissionCode,
+        );
 
-        const permissions = user.role.permissions.map((rp) => ({
-            action: rp.permission.action,
-            resource: rp.permission.resource,
-        }))
-
-        return {
-            access_toke: token,
-            user: {
-                id: user.id,
-                email: user.email,
-                role: user.role.name,
-                permissions
-            }
+        const payload = {
+            sub: user.id,
+            role: user.role.name,
+            permissions
         }
+        const access_token = this.jwt.sign(payload)
+
+
+        return { access_token }
     }
 }

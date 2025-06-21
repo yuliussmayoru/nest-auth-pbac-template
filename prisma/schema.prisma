@@ -13,7 +13,7 @@ model User {
   password  String
   name      String
   roleId    String
-  role      Role     @relation(fields: [roleId], references: [id])
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime?
   deletedAt DateTime?
@@ -32,11 +32,11 @@ model Role {
 }
 
 model Permission {
-  id          String   @id @default(uuid())
-  action      String
-  resource    String
-  description String?
-  roles       RolePermission[]
+  id                String    @id @default(uuid())
+  permissionName    String
+  permissionCode    String    @unique
+  description       String?
+  roles             RolePermission[]
 }
 
 model RolePermission {

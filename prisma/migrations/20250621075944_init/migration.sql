@@ -6,10 +6,10 @@ CREATE TABLE "User" (
     "name" TEXT NOT NULL,
     "roleId" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    "deletedAt" DATETIME NOT NULL,
+    "updatedAt" DATETIME,
+    "deletedAt" DATETIME,
     "updatedBy" TEXT NOT NULL,
-    CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -17,8 +17,8 @@ CREATE TABLE "Role" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "name" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    "deletedAt" DATETIME NOT NULL,
+    "updatedAt" DATETIME,
+    "deletedAt" DATETIME,
     "updatedBy" TEXT NOT NULL
 );
 
@@ -35,7 +35,7 @@ CREATE TABLE "RolePermission" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "roleId" TEXT NOT NULL,
     "permissionId" TEXT NOT NULL,
-    CONSTRAINT "RolePermission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "RolePermission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "RolePermission_permissionId_fkey" FOREIGN KEY ("permissionId") REFERENCES "Permission" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 

@@ -24,6 +24,7 @@ export class RoleService {
                     permissions: { include: { permission: true}}
                 }
             })
+            return role;
         } catch (error) {
             this.logger.error(`Failed to create role: ${error.message}`)
             throw new InternalServerErrorException('Failed to create role')
@@ -83,7 +84,9 @@ export class RoleService {
                 data: {
                     deletedAt: new Date(),
                     updatedBy: userId,
-                }  
+                }, include: {
+                    permissions: { include: { permission: true }}
+                }
             });
             return role
         } catch (error) {

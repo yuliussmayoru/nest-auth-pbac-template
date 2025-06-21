@@ -3,6 +3,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/roles.decorator';
+import { permission } from 'process';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -14,15 +15,12 @@ export class PermissionsGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
-    if (!required) return true;
+    if (!required || required.length) return true;
 
     const { user } = context.switchToHttp().getRequest();
-    const  userPermissions = user.permissions || []
+    const  userPermissionCodes: string[] =
+    user?.role?.permissions?.map((rp) => rp.permission.permissonCode) || [];
 
-    return required.every((permission) =>
-      userPermissions.some(
-        (p) => `${p.action}:${p.resource}` === permission
-      )
-    )
+    return required.every((permission) => userPermissionCodes.includes(permission))
   }
 }
