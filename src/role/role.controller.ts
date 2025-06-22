@@ -32,9 +32,14 @@ export class RoleController {
     }
 
     @Patch(':id')
-    @Permissions('update:role')
-    async update(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
-        return this.role.update(id, dto);
+    @Permissions('manage:roles')
+    update(
+        @Param('id') id: string,
+        @Body() dto: UpdateRoleDto,
+        @Req() req,
+    ) {
+    const currentUserId = req.user.userId;
+        return this.role.update(id, dto, currentUserId);
     }
 
     @Delete(':id')

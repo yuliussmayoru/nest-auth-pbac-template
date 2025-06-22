@@ -21,6 +21,9 @@ export class UserService {
                     name: dto.name,
                     roleId: dto.roleId,
                     updatedBy: currentUserId
+                },
+                include: {
+                    role: true,
                 }
             })
             return user
@@ -64,6 +67,9 @@ export class UserService {
                     roleId: dto.roleId,
                     updatedBy: currentUserId,
                     ...(hashedPassword ? { password: hashedPassword }: {})
+                },
+                include: {
+                    role: true,
                 }
             })
             return user

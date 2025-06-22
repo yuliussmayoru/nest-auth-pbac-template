@@ -50,28 +50,46 @@ export class RoleService {
         if (!role) throw new NotFoundException('Role not found')
     }
 
-    async update(id: string, dto: UpdateRoleDto) {
-        try {
-            await this.prisma.rolePermission.deleteMany({ where: { roleId: id }})
+    async update(id: string, dto: UpdateRoleDto, userId) {
+        const existing = await this.prisma.role.findUnique({
+            where: { id },
+            select: { id: true },
+        })
+        if (!existing) {
+            throw new NotFoundException(`Role ${id} not found`);
+        }
 
-            const role = await this.prisma.role.update({
-                where: { id },
-                data: {
-                    name: dto.name,
-                    permissions: {
-                        create: dto.permissionIds?.map((pid) => ({
-                            permission: { connect: { id: pid }}
-                        }))
+        const perms = await this.prisma.permission.findMany({
+            where: { id: { in: dto.permissionIds } },
+            select: { id: true },
+        })
+        if (perms.length !== dto.permissionIds?.length) {
+            throw new NotFoundException('One or more permissions not found')
+        }
+
+        try {
+            const [, updatedRole] = await this.prisma.$transaction([
+                this.prisma.rolePermission.deleteMany({ where: { roleId: id }}),
+                this.prisma.role.update({
+                    where: { id },
+                    data: {
+                        name: dto.name,
+                        updatedBy: userId,
+                        permissions: {
+                            create: dto.permissionIds.map(pid => ({
+                                permission: { connect: { id: pid }}
+                            }))
+                        }
+                    },
+                    include: {
+                        permissions: { include: { permission: true }}
                     }
-                },
-                include: {
-                    permissions: { include: { permission: true }}
-                }
-            })
-            return role
-        } catch (error) {
-            this.logger.error(`Failed to update role ${id}:${error.message}`)
-            throw new InternalServerErrorException('Failed to update role')
+                })
+            ]);
+            return updatedRole
+        } catch (error: any) {
+            this.logger.error(`failed to update role ${id}: ${error.message}`);
+            throw new InternalServerErrorException('Failed to update role');
         }
     }
 
